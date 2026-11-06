@@ -380,14 +380,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const resetCamBtn = document.getElementById('btn-reset-cam');
     if (resetCamBtn) {
         resetCamBtn.addEventListener('click', () => {
-            if (scene.controls && scene.camera) {
-                if (typeof gsap !== 'undefined') {
-                    gsap.to(scene.camera.position, { x: 0, y: 3.8, z: 10.5, duration: 0.8, ease: 'power2.out' });
-                    gsap.to(scene.controls.target, { x: 0, y: 1.8, z: 0, duration: 0.8, ease: 'power2.out' });
-                } else {
-                    scene.camera.position.set(0, 3.8, 10.5);
-                    scene.controls.target.set(0, 1.8, 0);
-                }
+            if (scene) {
+                scene.updateCameraResponsive();
             }
             if (window.birthdayAudio) window.birthdayAudio.playPop();
         });

@@ -45,7 +45,6 @@ class BirthdayScene {
 
         // 2. Camera
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
-        this.camera.position.set(0, 3.8, 10.5);
 
         // 3. Renderer
         this.renderer = new THREE.WebGLRenderer({
@@ -67,10 +66,17 @@ class BirthdayScene {
             this.controls.dampingFactor = 0.05;
             this.controls.enablePan = false;
             this.controls.minDistance = 5.0;
-            this.controls.maxDistance = 16.0;
+            this.controls.maxDistance = 20.0;
             this.controls.maxPolarAngle = Math.PI / 2 + 0.05;
             this.controls.target.set(0, 1.8, 0);
+            this.controls.touches = {
+                ONE: THREE.TOUCH.ROTATE,
+                TWO: THREE.TOUCH.DOLLY_PAN
+            };
         }
+
+        // Apply Responsive Framing for Mobile vs Desktop
+        this.updateCameraResponsive();
 
         // 5. Lights
         this.setupLights();
@@ -927,12 +933,40 @@ class BirthdayScene {
         }
     }
 
-    onWindowResize() {
+    updateCameraResponsive() {
         const width = this.container.clientWidth || window.innerWidth;
         const height = this.container.clientHeight || window.innerHeight;
-        this.camera.aspect = width / height;
+        const aspect = width / height;
+
+        if (aspect < 0.6) {
+            // Very tall/narrow portrait phones (iPhone, Galaxy)
+            this.camera.position.set(0, 3.6, 14.5);
+            this.camera.fov = 52;
+            if (this.controls) this.controls.target.set(0, 1.6, 0);
+        } else if (aspect < 0.85) {
+            // Standard mobile portrait
+            this.camera.position.set(0, 3.7, 13.0);
+            this.camera.fov = 48;
+            if (this.controls) this.controls.target.set(0, 1.7, 0);
+        } else if (aspect < 1.2) {
+            // Tablet / iPad
+            this.camera.position.set(0, 3.8, 11.5);
+            this.camera.fov = 46;
+            if (this.controls) this.controls.target.set(0, 1.8, 0);
+        } else {
+            // Desktop
+            this.camera.position.set(0, 3.8, 10.5);
+            this.camera.fov = 45;
+            if (this.controls) this.controls.target.set(0, 1.8, 0);
+        }
+
+        this.camera.aspect = aspect;
         this.camera.updateProjectionMatrix();
         this.renderer.setSize(width, height);
+    }
+
+    onWindowResize() {
+        this.updateCameraResponsive();
     }
 
     animate() {
