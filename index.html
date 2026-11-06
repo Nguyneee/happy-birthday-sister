@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Chúc Mừng Sinh Nhật Chị Yêu ✨ | Happy Birthday 3D</title>
+    <meta name="description" content="Thiệp chúc mừng sinh nhật 3D lung linh dành tặng người chị gái tuyệt vời nhất!">
+    
+    <!-- OpenGraph / Social Sharing -->
+    <meta property="og:title" content="Chúc Mừng Sinh Nhật Chị Gái Yêu Quý 🎉🎂">
+    <meta property="og:description" content="Chạm để mở món quà sinh nhật 3D đặc biệt đầy bất ngờ!">
+    <meta property="og:type" content="website">
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/style.css">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
+</head>
+<body>
+
+    <!-- 1. WebGL 3D Canvas Container -->
+    <div id="canvas-container"></div>
+
+    <!-- 2. Intro Welcome Overlay (The Unwrapping Gift) -->
+    <div id="intro-overlay" class="intro-overlay">
+        <div class="intro-card">
+            <div class="intro-gift-icon">🎁</div>
+            <p class="intro-subtitle">Gửi người chị tuyệt vời nhất</p>
+            <h1 class="intro-title"><span class="sister-name-display">Chị Gái Yêu Quý</span></h1>
+            <p class="intro-desc">
+                Em có một món quà sinh nhật 3D đặc biệt muốn dành tặng riêng cho chị. Hãy bật loa lên để tận hưởng trọn vẹn nhé! ✨
+            </p>
+            <button id="btn-open-gift" class="btn-open-gift">
+                <span>Mở món quà sinh nhật</span>
+                <span>✨</span>
+            </button>
+        </div>
+    </div>
+
+    <!-- 3. Main HUD (Interactive UI Overlay) -->
+    <div id="main-hud" class="main-hud opacity-0">
+        <!-- Top Bar -->
+        <header class="top-bar">
+            <div class="logo-tag">
+                <span>🎂</span>
+                <span>HAPPY BIRTHDAY</span>
+            </div>
+            <div class="top-actions">
+                <!-- Music Toggle Button -->
+                <button id="btn-toggle-music" class="icon-btn active" title="Bật/Tắt Nhạc Sinh Nhật">
+                    <div id="audio-waves" class="audio-waves">
+                        <span></span>
+                        <span></span>
+                        <span></span>
+                    </div>
+                </button>
+                <!-- Auto-Rotate Toggle -->
+                <button id="btn-toggle-rotate" class="icon-btn active" title="Tự động xoay 3D">
+                    <span>🔄</span>
+                </button>
+                <!-- Camera Reset -->
+                <button id="btn-reset-cam" class="icon-btn" title="Đặt lại góc nhìn">
+                    <span>🎯</span>
+                </button>
+                <!-- Customizer Modal Button -->
+                <button class="icon-btn" data-open-modal="modal-customize" title="Tùy chỉnh tên & lời chúc">
+                    <span>✍️</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Center Celebratory Banner (Hidden until blown) -->
+        <div id="celebration-banner" class="celebration-banner hidden">
+            <span class="badge-tag">CHÚC MỪNG SINH NHẬT</span>
+            <h2 class="hero-hbd-text">Tuổi Mới Rực Rỡ & Hạnh Phúc! 🎉</h2>
+        </div>
+
+        <!-- Bottom Container -->
+        <div class="bottom-container">
+            <!-- Blow Candle Action Button -->
+            <button id="btn-blow-candle" class="btn-blow-candle">
+                <span class="btn-icon">🎂</span>
+                <span class="btn-text">Ước một điều ước & Thổi nến</span>
+            </button>
+
+            <!-- Navigation Tabs (Revealed after blow) -->
+            <nav id="action-navbar" class="action-navbar opacity-0 pointer-events-none">
+                <button class="nav-tab-btn" data-open-modal="modal-letter">
+                    <span>💌</span>
+                    <span>Bức Thư Gửi Chị</span>
+                </button>
+                <button class="nav-tab-btn" data-open-modal="modal-vouchers">
+                    <span>🎁</span>
+                    <span>Sổ Thẻ Đặc Quyền</span>
+                </button>
+                <button class="nav-tab-btn" data-open-modal="modal-lantern">
+                    <span>🏮</span>
+                    <span>Thả Đèn Ước Nguyện</span>
+                </button>
+                <button class="nav-tab-btn" data-open-modal="modal-memories">
+                    <span>📸</span>
+                    <span>Góc Kỷ Niệm</span>
+                </button>
+            </nav>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL 1: BỨC THƯ GỬI CHỊ (HEARTFELT LETTER)
+         ======================================================== -->
+    <div id="modal-letter" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <button class="modal-close-corner btn-close-modal">✕</button>
+            <div class="letter-paper">
+                <div class="wax-seal">★</div>
+                <div class="letter-salutation">
+                    Gửi <span class="sister-name-display">Chị Gái Yêu Quý</span> thân thương,
+                </div>
+                <div id="letter-content-text" class="letter-body">
+                    Hôm nay là một ngày thật đặc biệt — ngày mà một người chị tuyệt vời, xinh đẹp và ấm áp nhất trên đời ra đời! ✨<br><br>
+                    Cảm ơn chị vì đã luôn bao dung, che chở và chia sẻ mọi vui buồn cùng em. Dù đôi khi hai chị em có chí chóe, nhưng trong lòng em, chị luôn là thần tượng và là điểm tựa vững chãi nhất.<br><br>
+                    Bước sang tuổi mới, em chúc chị:<br>
+                    🌸 Nhan sắc ngày càng thăng hạng, luôn trẻ trung và rạng ngời như tuổi đôi mươi.<br>
+                    💼 Công việc thuận buồm xuôi gió, gặt hái được mọi ước mơ và dự định.<br>
+                    💰 Tiền bạc rủng rỉnh, tiêu xài không cần nhìn giá!<br>
+                    💖 Luôn được yêu thương, chiều chuộng và hạnh phúc trọn vẹn mỗi ngày!<br><br>
+                    Em luôn tự hào và biết ơn vì được làm em của chị! Chúc mừng sinh nhật chị yêu! 🎉🎂
+                </div>
+                <div class="letter-sign">
+                    <p class="letter-sign-text">Yêu thương vô bờ bến,</p>
+                    <p class="letter-signature sender-name-display">Em Của Chị</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL 2: SỔ THẺ ĐẶC QUYỀN (SISTER VOUCHERS)
+         ======================================================== -->
+    <div id="modal-vouchers" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <button class="modal-close-corner btn-close-modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-header-icon">🎁</div>
+                <h3 class="modal-title">Sổ Phiếu Đặc Quyền Cho Chị</h3>
+                <p class="modal-subtitle">Chạm vào từng thẻ để kích hoạt đặc quyền bất cứ lúc nào!</p>
+            </div>
+            <div class="vouchers-grid">
+                <!-- Voucher 1 -->
+                <div class="voucher-card">
+                    <div class="voucher-icon">🧋</div>
+                    <div class="voucher-title">Voucher Trà Sữa Full Topping</div>
+                    <p class="voucher-desc">Tài trợ 1 ly trà sữa thương hiệu yêu thích, full topping, ngọt 50% đá 70% bất kỳ lúc nào chị thèm!</p>
+                    <div class="voucher-claim-hint">Chạm để kích hoạt ★</div>
+                    <div class="voucher-stamp hidden">ĐÃ KÍCH HOẠT</div>
+                </div>
+                <!-- Voucher 2 -->
+                <div class="voucher-card">
+                    <div class="voucher-icon">🧹</div>
+                    <div class="voucher-title">Voucher Miễn Việc Nhà 1 Tuần</div>
+                    <p class="voucher-desc">Chị cứ việc nghỉ ngơi làm đẹp, rửa bát, quét nhà và dọn dẹp phòng cứ để đứa em này gánh vác 100%!</p>
+                    <div class="voucher-claim-hint">Chạm để kích hoạt ★</div>
+                    <div class="voucher-stamp hidden">ĐÃ KÍCH HOẠT</div>
+                </div>
+                <!-- Voucher 3 -->
+                <div class="voucher-card">
+                    <div class="voucher-icon">🛍️</div>
+                    <div class="voucher-title">Voucher Xe Ôm & Porter Shopping</div>
+                    <p class="voucher-desc">Chở chị đi dạo phố, xách túi, chở đồ mua sắm từ sáng tới tối với nụ cười thân thiện, không than thở một lời!</p>
+                    <div class="voucher-claim-hint">Chạm để kích hoạt ★</div>
+                    <div class="voucher-stamp hidden">ĐÃ KÍCH HOẠT</div>
+                </div>
+                <!-- Voucher 4 -->
+                <div class="voucher-card">
+                    <div class="voucher-icon">💖</div>
+                    <div class="voucher-title">Voucher Chiều Chuộng 24 Giờ</div>
+                    <p class="voucher-desc">Đồng ý 100% với mọi yêu cầu hợp lý của chị trong vòng 24 giờ. Chị nói 1 là 1, nói 2 là 2 không cãi!</p>
+                    <div class="voucher-claim-hint">Chạm để kích hoạt ★</div>
+                    <div class="voucher-stamp hidden">ĐÃ KÍCH HOẠT</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL 3: THẢ ĐÈN TRỜI ƯỚC NGUYỆN (3D SKY LANTERNS)
+         ======================================================== -->
+    <div id="modal-lantern" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <button class="modal-close-corner btn-close-modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-header-icon">🏮</div>
+                <h3 class="modal-title">Thả Đèn Trời Nguyện Ước 3D</h3>
+                <p class="modal-subtitle">Gửi gắm ước nguyện bay vào bầu trời sao lấp lánh</p>
+            </div>
+            <div class="lantern-form">
+                <div class="wish-chips-container">
+                    <button type="button" class="wish-chip">🌸 Luôn trẻ đẹp rạng ngời</button>
+                    <button type="button" class="wish-chip">💼 Sự nghiệp thăng hoa</button>
+                    <button type="button" class="wish-chip">💰 Tiền tài rủng rỉnh</button>
+                    <button type="button" class="wish-chip">💖 Hạnh phúc viên mãn</button>
+                    <button type="button" class="wish-chip">✈️ Du lịch khắp thế giới</button>
+                </div>
+                <textarea id="lantern-wish-input" class="wish-textarea" rows="3" placeholder="Nhập lời chúc hoặc điều ước của chị tại đây..."></textarea>
+                <button id="btn-send-lantern" class="btn-send-lantern">
+                    <span>🏮</span>
+                    <span>Thả đèn lên bầu trời 3D</span>
+                </button>
+                <div id="lantern-success-msg" class="lantern-msg hidden"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL 4: GÓC KỶ NIỆM (POLAROID MEMORY WALL)
+         ======================================================== -->
+    <div id="modal-memories" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <button class="modal-close-corner btn-close-modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-header-icon">📸</div>
+                <h3 class="modal-title">Góc Kỷ Niệm Của Chúng Mình</h3>
+                <p class="modal-subtitle">Những khoảnh khắc ấm áp và yêu thương</p>
+            </div>
+            <div id="polaroid-grid" class="polaroid-grid">
+                <!-- Polaroid 1 -->
+                <div class="polaroid-card" style="transform: rotate(-3deg);">
+                    <div class="polaroid-tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <div class="polaroid-illustration">👭</div>
+                    </div>
+                    <p class="polaroid-caption">Chị em luôn có nhau 💕</p>
+                </div>
+                <!-- Polaroid 2 -->
+                <div class="polaroid-card" style="transform: rotate(4deg);">
+                    <div class="polaroid-tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <div class="polaroid-illustration">☕</div>
+                    </div>
+                    <p class="polaroid-caption">Những buổi cà phê tâm sự ☕</p>
+                </div>
+                <!-- Polaroid 3 -->
+                <div class="polaroid-card" style="transform: rotate(-2deg);">
+                    <div class="polaroid-tape"></div>
+                    <div class="polaroid-img-wrapper">
+                        <div class="polaroid-illustration">✈️</div>
+                    </div>
+                    <p class="polaroid-caption">Cùng nhau vi vu muôn nơi ✈️</p>
+                </div>
+            </div>
+
+            <div class="upload-photo-box">
+                <label for="photo-upload-input" class="btn-upload-photo">
+                    <span>📷</span>
+                    <span>Tải ảnh thật của hai chị em lên thiệp</span>
+                </label>
+                <input type="file" id="photo-upload-input" accept="image/*" multiple style="display: none;">
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================================
+         MODAL 5: TÙY CHỈNH THÔNG TIN (CUSTOMIZER)
+         ======================================================== -->
+    <div id="modal-customize" class="modal-backdrop hidden">
+        <div class="modal-content">
+            <button class="modal-close-corner btn-close-modal">✕</button>
+            <div class="modal-header">
+                <div class="modal-header-icon">✍️</div>
+                <h3 class="modal-title">Tùy Chỉnh Thiệp Sinh Nhật</h3>
+                <p class="modal-subtitle">Cá nhân hóa tên gọi và lời nhắn gửi</p>
+            </div>
+            <div class="cfg-form">
+                <div class="cfg-group">
+                    <label class="cfg-label">Tên hoặc danh xưng của chị:</label>
+                    <input type="text" id="cfg-sister-name" class="cfg-input" placeholder="Ví dụ: Chị Mai Yêu Quý, Chị Linh, Chị Hai...">
+                </div>
+                <div class="cfg-group">
+                    <label class="cfg-label">Tên người gửi (Em):</label>
+                    <input type="text" id="cfg-sender-name" class="cfg-input" placeholder="Ví dụ: Em Nam, Em Gái Cưng...">
+                </div>
+                <div class="cfg-group">
+                    <label class="cfg-label">Nội dung bức thư chúc mừng:</label>
+                    <textarea id="cfg-letter" class="cfg-input" rows="6" placeholder="Nhập lời chúc từ tận đáy lòng của bạn..."></textarea>
+                </div>
+                <div class="cfg-actions">
+                    <button id="btn-save-cfg" class="btn-save-cfg">Lưu & Cập Nhật Ngay ✨</button>
+                    <button id="btn-reset-cfg" class="btn-reset-cfg">Mặc Định</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- External Libraries: Three.js, OrbitControls, GSAP, Canvas Confetti -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <!-- Application Scripts -->
+    <script src="js/audio.js"></script>
+    <script src="js/scene3d.js"></script>
+    <script src="js/main.js"></script>
+</body>
+</html>
