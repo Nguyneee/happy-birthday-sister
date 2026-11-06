@@ -276,9 +276,8 @@ class BirthdayScene {
 
     createStrawberry() {
         const group = new THREE.Group();
-        // Berry body
+        // Berry body: pointed tip at top, wide base at bottom
         const berryGeo = new THREE.ConeGeometry(0.18, 0.32, 16);
-        berryGeo.rotateX(Math.PI);
         berryGeo.translate(0, 0.16, 0);
         const berryMat = new THREE.MeshStandardMaterial({
             color: 0xd90429,
@@ -288,12 +287,12 @@ class BirthdayScene {
         const berry = new THREE.Mesh(berryGeo, berryMat);
         group.add(berry);
 
-        // Green leaf crown
+        // Green leaf crown at bottom base
         const leafMat = new THREE.MeshStandardMaterial({ color: 0x38b000, roughness: 0.5 });
         for (let i = 0; i < 4; i++) {
             const angle = (i / 4) * Math.PI * 2;
-            const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.16), leafMat);
-            leaf.position.set(Math.cos(angle) * 0.07, 0.32, Math.sin(angle) * 0.07);
+            const leaf = new THREE.Mesh(new THREE.BoxGeometry(0.08, 0.02, 0.14), leafMat);
+            leaf.position.set(Math.cos(angle) * 0.12, 0.02, Math.sin(angle) * 0.12);
             leaf.rotation.y = angle;
             group.add(leaf);
         }
@@ -304,119 +303,119 @@ class BirthdayScene {
      * 3D Candlesticks in Shape of Number "3" and "1"
      */
     createNumberCandles31() {
-        // Luxury Golden Wax Material
+        // Luxury Golden Wax Material with brilliant gloss and shimmer
         const candleMat = new THREE.MeshStandardMaterial({
-            color: 0xffd166,
-            metalness: 0.75,
-            roughness: 0.22,
-            envMapIntensity: 1.2
+            color: 0xffd700,
+            metalness: 0.85,
+            roughness: 0.18,
+            envMapIntensity: 1.5
         });
 
         const extrudeSettings = {
-            depth: 0.11,
+            depth: 0.16,
             bevelEnabled: true,
-            bevelThickness: 0.025,
-            bevelSize: 0.025,
+            bevelThickness: 0.035,
+            bevelSize: 0.035,
             bevelSegments: 4
         };
 
-        // --- DIGIT 3 ---
+        // --- BOLD DIGIT 3 ---
         const s3 = new THREE.Shape();
-        s3.moveTo(-0.18, 0.42);
-        s3.lineTo(0.18, 0.42);
-        s3.quadraticCurveTo(0.28, 0.42, 0.28, 0.22);
-        s3.quadraticCurveTo(0.28, 0.04, 0.08, 0.02);
-        s3.quadraticCurveTo(0.30, 0.0, 0.30, -0.22);
-        s3.quadraticCurveTo(0.30, -0.42, 0.15, -0.42);
-        s3.lineTo(-0.18, -0.42);
-        s3.lineTo(-0.18, -0.26);
-        s3.lineTo(0.12, -0.26);
-        s3.quadraticCurveTo(0.18, -0.26, 0.18, -0.18);
-        s3.quadraticCurveTo(0.18, -0.08, 0.04, -0.08);
-        s3.lineTo(-0.08, -0.08);
-        s3.lineTo(-0.08, 0.06);
-        s3.lineTo(0.04, 0.06);
-        s3.quadraticCurveTo(0.16, 0.06, 0.16, 0.16);
-        s3.quadraticCurveTo(0.16, 0.26, 0.10, 0.26);
-        s3.lineTo(-0.18, 0.26);
+        s3.moveTo(-0.25, 0.55);
+        s3.lineTo(0.25, 0.55);
+        s3.quadraticCurveTo(0.38, 0.55, 0.38, 0.28);
+        s3.quadraticCurveTo(0.38, 0.06, 0.10, 0.02);
+        s3.quadraticCurveTo(0.40, -0.02, 0.40, -0.28);
+        s3.quadraticCurveTo(0.40, -0.55, 0.20, -0.55);
+        s3.lineTo(-0.25, -0.55);
+        s3.lineTo(-0.25, -0.35);
+        s3.lineTo(0.16, -0.35);
+        s3.quadraticCurveTo(0.24, -0.35, 0.24, -0.24);
+        s3.quadraticCurveTo(0.24, -0.12, 0.05, -0.12);
+        s3.lineTo(-0.12, -0.12);
+        s3.lineTo(-0.12, 0.08);
+        s3.lineTo(0.05, 0.08);
+        s3.quadraticCurveTo(0.22, 0.08, 0.22, 0.22);
+        s3.quadraticCurveTo(0.22, 0.35, 0.14, 0.35);
+        s3.lineTo(-0.25, 0.35);
         s3.closePath();
 
         const geo3 = new THREE.ExtrudeGeometry(s3, extrudeSettings);
         const mesh3 = new THREE.Mesh(geo3, candleMat);
         mesh3.castShadow = true;
-        // Position number 3 on left
-        const posX3 = -0.32;
-        const posY = 3.82;
-        mesh3.position.set(posX3 - 0.05, posY, 0);
+        // Position number 3 on left of center
+        const posX3 = -0.36;
+        const posY = 3.95;
+        mesh3.position.set(posX3 - 0.07, posY, 0);
         this.cakeGroup.add(mesh3);
 
         // Pick / stick at bottom of digit 3
         const pickMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
-        const pick3 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3, 12), pickMat);
-        pick3.position.set(posX3, posY - 0.48, 0.05);
+        const pick3 = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.35, 12), pickMat);
+        pick3.position.set(posX3, posY - 0.65, 0.08);
         this.cakeGroup.add(pick3);
 
         // Wick 3
         const wickMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
-        const wick3 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.12, 8), wickMat);
-        wick3.position.set(posX3 + 0.02, posY + 0.5, 0.05);
+        const wick3 = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.14, 8), wickMat);
+        wick3.position.set(posX3 + 0.04, posY + 0.65, 0.08);
         this.cakeGroup.add(wick3);
 
         // Flame 3
         const flame3 = this.createFlameMesh();
-        flame3.position.set(posX3 + 0.02, posY + 0.64, 0.05);
+        flame3.position.set(posX3 + 0.04, posY + 0.80, 0.08);
         this.cakeGroup.add(flame3);
         this.candleFlames.push(flame3);
 
         // Candle Light 3
-        const light3 = new THREE.PointLight(0xffa726, 2.0, 8, 2);
-        light3.position.set(posX3 + 0.02, posY + 0.65, 0.15);
+        const light3 = new THREE.PointLight(0xffa726, 2.2, 9, 2);
+        light3.position.set(posX3 + 0.04, posY + 0.82, 0.2);
         light3.castShadow = true;
         this.scene.add(light3);
         this.candleLights.push(light3);
 
-        // --- DIGIT 1 ---
+        // --- BOLD DIGIT 1 ---
         const s1 = new THREE.Shape();
-        s1.moveTo(-0.16, -0.42);
-        s1.lineTo(0.16, -0.42);
-        s1.lineTo(0.16, -0.26);
-        s1.lineTo(0.06, -0.26);
-        s1.lineTo(0.06, 0.42);
-        s1.lineTo(-0.06, 0.42);
-        s1.lineTo(-0.20, 0.24);
-        s1.lineTo(-0.12, 0.16);
-        s1.lineTo(-0.06, 0.22);
-        s1.lineTo(-0.06, -0.26);
-        s1.lineTo(-0.16, -0.26);
+        s1.moveTo(-0.22, -0.55);
+        s1.lineTo(0.22, -0.55);
+        s1.lineTo(0.22, -0.35);
+        s1.lineTo(0.08, -0.35);
+        s1.lineTo(0.08, 0.55);
+        s1.lineTo(-0.08, 0.55);
+        s1.lineTo(-0.28, 0.32);
+        s1.lineTo(-0.16, 0.20);
+        s1.lineTo(-0.08, 0.28);
+        s1.lineTo(-0.08, -0.35);
+        s1.lineTo(-0.22, -0.35);
         s1.closePath();
 
         const geo1 = new THREE.ExtrudeGeometry(s1, extrudeSettings);
         const mesh1 = new THREE.Mesh(geo1, candleMat);
         mesh1.castShadow = true;
-        // Position number 1 on right
-        const posX1 = 0.32;
-        mesh1.position.set(posX1 - 0.02, posY, 0);
+        // Position number 1 on right of center
+        const posX1 = 0.36;
+        mesh1.position.set(posX1 - 0.03, posY, 0);
         this.cakeGroup.add(mesh1);
 
         // Pick / stick at bottom of digit 1
-        const pick1 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3, 12), pickMat);
-        pick1.position.set(posX1, posY - 0.48, 0.05);
+        const pick1 = new THREE.Mesh(new THREE.CylinderGeometry(0.025, 0.025, 0.35, 12), pickMat);
+        pick1.position.set(posX1, posY - 0.65, 0.08);
         this.cakeGroup.add(pick1);
 
         // Wick 1
-        const wick1 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.12, 8), wickMat);
-        wick1.position.set(posX1, posY + 0.5, 0.05);
+        const wick1 = new THREE.Mesh(new THREE.CylinderGeometry(0.015, 0.015, 0.14, 8), wickMat);
+        wick1.position.set(posX1, posY + 0.65, 0.08);
         this.cakeGroup.add(wick1);
 
         // Flame 1
         const flame1 = this.createFlameMesh();
-        flame1.position.set(posX1, posY + 0.64, 0.05);
+        flame1.position.set(posX1, posY + 0.80, 0.08);
         this.cakeGroup.add(flame1);
         this.candleFlames.push(flame1);
 
         // Candle Light 1
-        const light1 = new THREE.PointLight(0xffa726, 2.0, 8, 2);
-        light1.position.set(posX1, posY + 0.65, 0.15);
+        const light1 = new THREE.PointLight(0xffa726, 2.2, 9, 2);
+        light1.position.set(posX1, posY + 0.82, 0.2);
         light1.castShadow = true;
         this.scene.add(light1);
         this.candleLights.push(light1);
