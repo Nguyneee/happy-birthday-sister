@@ -1,6 +1,7 @@
 /**
  * 3D Birthday Experience using Three.js
- * Multi-tier Cake, Flickering Candle, Floating Balloons, Gift Boxes,
+ * Multi-tier Cake with 3D Number 31 Candles, Dual Flickering Flames,
+ * Fairy Light Garlands, Party Bunting, Floating Balloons, Gift Boxes,
  * Wishing Sky Lanterns, 3D Confetti Physics & Starfield.
  */
 
@@ -14,14 +15,16 @@ class BirthdayScene {
 
         // State
         this.isCandleLit = true;
-        this.candleFlame = null;
-        this.candleLight = null;
+        this.candleFlames = [];
+        this.candleLights = [];
         this.cakeGroup = new THREE.Group();
         this.balloons = [];
         this.floatingPresents = [];
         this.lanterns = [];
         this.confettiPieces = [];
         this.smokeParticles = [];
+        this.fairyLights = [];
+        this.buntingFlags = [];
         this.stars = null;
         this.clock = new THREE.Clock();
 
@@ -38,7 +41,7 @@ class BirthdayScene {
 
         // 1. Scene & Atmospheric Fog
         this.scene = new THREE.Scene();
-        this.scene.fog = new THREE.FogExp2(0x160728, 0.022);
+        this.scene.fog = new THREE.FogExp2(0x130722, 0.022);
 
         // 2. Camera
         this.camera = new THREE.PerspectiveCamera(45, width / height, 0.1, 1000);
@@ -57,7 +60,7 @@ class BirthdayScene {
         this.renderer.shadowMap.type = THREE.PCFSoftShadowMap;
         this.container.appendChild(this.renderer.domElement);
 
-        // 4. Controls
+        // 4. OrbitControls
         if (typeof THREE.OrbitControls !== 'undefined') {
             this.controls = new THREE.OrbitControls(this.camera, this.renderer.domElement);
             this.controls.enableDamping = true;
@@ -65,15 +68,19 @@ class BirthdayScene {
             this.controls.enablePan = false;
             this.controls.minDistance = 5.0;
             this.controls.maxDistance = 16.0;
-            this.controls.maxPolarAngle = Math.PI / 2 + 0.05; // Don't clip underneath table
+            this.controls.maxPolarAngle = Math.PI / 2 + 0.05;
             this.controls.target.set(0, 1.8, 0);
         }
 
         // 5. Lights
         this.setupLights();
 
-        // 6. Build 3D Objects
+        // 6. Build 3D Objects & Background Environment
+        this.createPartyTable();
         this.createCake();
+        this.createNumberCandles31();
+        this.createFairyLightsBackground();
+        this.createBuntingFlagsBackground();
         this.createBalloons();
         this.createFloatingPresents();
         this.createStarfield();
@@ -90,11 +97,11 @@ class BirthdayScene {
 
     setupLights() {
         // Ambient Light - soft mystical lavender
-        const ambientLight = new THREE.AmbientLight(0x524068, 1.1);
+        const ambientLight = new THREE.AmbientLight(0x5a4373, 1.15);
         this.scene.add(ambientLight);
 
         // Main Warm Sun Light
-        const mainLight = new THREE.DirectionalLight(0xfff1dc, 1.3);
+        const mainLight = new THREE.DirectionalLight(0xfff2de, 1.35);
         mainLight.position.set(6, 12, 8);
         mainLight.castShadow = true;
         mainLight.shadow.mapSize.width = 1024;
@@ -104,20 +111,40 @@ class BirthdayScene {
         this.scene.add(mainLight);
 
         // Rim Light - neon rose magenta
-        const rimLight = new THREE.DirectionalLight(0xff6097, 1.2);
+        const rimLight = new THREE.DirectionalLight(0xff5599, 1.25);
         rimLight.position.set(-8, 6, -8);
         this.scene.add(rimLight);
 
-        // Candle Point Light - warm flickering golden flame
-        this.candleLight = new THREE.PointLight(0xffa040, 2.5, 9, 2);
-        this.candleLight.position.set(0, 4.3, 0);
-        this.candleLight.castShadow = true;
-        this.scene.add(this.candleLight);
-
         // Subtle bottom soft bounce light
-        const bounceLight = new THREE.PointLight(0x9c27b0, 0.8, 10);
+        const bounceLight = new THREE.PointLight(0xa8329e, 0.9, 12);
         bounceLight.position.set(0, -3, 0);
         this.scene.add(bounceLight);
+    }
+
+    createPartyTable() {
+        // Large round banquet table surface below the cake
+        const tableGeo = new THREE.CylinderGeometry(8.5, 8.5, 0.4, 64);
+        const tableMat = new THREE.MeshStandardMaterial({
+            color: 0x210c38,
+            roughness: 0.35,
+            metalness: 0.25
+        });
+        const table = new THREE.Mesh(tableGeo, tableMat);
+        table.position.y = -0.45;
+        table.receiveShadow = true;
+        this.scene.add(table);
+
+        // Glowing golden table edge rim
+        const rimGeo = new THREE.TorusGeometry(8.52, 0.06, 16, 64);
+        const rimMat = new THREE.MeshStandardMaterial({
+            color: 0xffd700,
+            metalness: 0.8,
+            roughness: 0.2
+        });
+        const rim = new THREE.Mesh(rimGeo, rimMat);
+        rim.rotation.x = Math.PI / 2;
+        rim.position.y = -0.25;
+        this.scene.add(rim);
     }
 
     createCake() {
@@ -126,8 +153,7 @@ class BirthdayScene {
         const plateMat = new THREE.MeshStandardMaterial({
             color: 0xffeef5,
             metalness: 0.35,
-            roughness: 0.2,
-            envMapIntensity: 1.0
+            roughness: 0.2
         });
         const plate = new THREE.Mesh(plateGeo, plateMat);
         plate.position.y = 0.125;
@@ -233,78 +259,18 @@ class BirthdayScene {
             this.cakeGroup.add(cream);
         }
 
-        // 3D Strawberries on Top
-        const strawberryCount = 5;
-        for (let i = 0; i < strawberryCount; i++) {
-            const angle = (i / strawberryCount) * Math.PI * 2 + 0.3;
-            const sx = Math.cos(angle) * 0.55;
-            const sz = Math.sin(angle) * 0.55;
+        // 3D Strawberries on Top Tier (placed strategically to frame the 31 candles)
+        const berryAngles = [Math.PI * 0.55, Math.PI * 0.85, Math.PI * 1.15, Math.PI * 1.45];
+        berryAngles.forEach(angle => {
+            const sx = Math.cos(angle) * 0.62;
+            const sz = Math.sin(angle) * 0.62;
             const berryGroup = this.createStrawberry();
             berryGroup.position.set(sx, 3.42, sz);
-            berryGroup.scale.set(0.7, 0.7, 0.7);
+            berryGroup.scale.set(0.68, 0.68, 0.68);
             this.cakeGroup.add(berryGroup);
-        }
-
-        // --- GOLDEN BIRTHDAY CANDLE ---
-        const candleGeo = new THREE.CylinderGeometry(0.08, 0.08, 0.95, 32);
-        const candleMat = new THREE.MeshStandardMaterial({
-            color: 0xffe082,
-            metalness: 0.7,
-            roughness: 0.2
         });
-        const candle = new THREE.Mesh(candleGeo, candleMat);
-        candle.position.set(0, 3.8, 0);
-        candle.castShadow = true;
-        this.cakeGroup.add(candle);
 
-        // Candle Wick
-        const wickGeo = new THREE.CylinderGeometry(0.015, 0.015, 0.14, 8);
-        const wickMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
-        const wick = new THREE.Mesh(wickGeo, wickMat);
-        wick.position.set(0, 4.3, 0);
-        this.cakeGroup.add(wick);
-
-        // --- CANDLE FLAME ---
-        const flameGroup = new THREE.Group();
-        flameGroup.position.set(0, 4.45, 0);
-
-        // Outer Flame (Glowing Orange)
-        const outerFlameGeo = new THREE.ConeGeometry(0.08, 0.26, 16);
-        outerFlameGeo.translate(0, 0.13, 0);
-        const outerFlameMat = new THREE.MeshBasicMaterial({
-            color: 0xff7700,
-            transparent: true,
-            opacity: 0.9
-        });
-        const outerFlame = new THREE.Mesh(outerFlameGeo, outerFlameMat);
-        flameGroup.add(outerFlame);
-
-        // Inner Flame Core (Bright Yellow-White)
-        const innerFlameGeo = new THREE.ConeGeometry(0.045, 0.17, 16);
-        innerFlameGeo.translate(0, 0.085, 0);
-        const innerFlameMat = new THREE.MeshBasicMaterial({
-            color: 0xffffff,
-            transparent: true,
-            opacity: 0.95
-        });
-        const innerFlame = new THREE.Mesh(innerFlameGeo, innerFlameMat);
-        flameGroup.add(innerFlame);
-
-        // Flame Halo Aura (Soft Sphere)
-        const haloGeo = new THREE.SphereGeometry(0.18, 16, 16);
-        const haloMat = new THREE.MeshBasicMaterial({
-            color: 0xffa500,
-            transparent: true,
-            opacity: 0.25
-        });
-        const halo = new THREE.Mesh(haloGeo, haloMat);
-        halo.position.y = 0.12;
-        flameGroup.add(halo);
-
-        this.candleFlame = flameGroup;
-        this.cakeGroup.add(this.candleFlame);
-
-        // Add Entire Cake to Scene
+        // Add Entire Cake Base to Scene
         this.scene.add(this.cakeGroup);
     }
 
@@ -332,6 +298,270 @@ class BirthdayScene {
             group.add(leaf);
         }
         return group;
+    }
+
+    /**
+     * 3D Candlesticks in Shape of Number "3" and "1"
+     */
+    createNumberCandles31() {
+        // Luxury Golden Wax Material
+        const candleMat = new THREE.MeshStandardMaterial({
+            color: 0xffd166,
+            metalness: 0.75,
+            roughness: 0.22,
+            envMapIntensity: 1.2
+        });
+
+        const extrudeSettings = {
+            depth: 0.11,
+            bevelEnabled: true,
+            bevelThickness: 0.025,
+            bevelSize: 0.025,
+            bevelSegments: 4
+        };
+
+        // --- DIGIT 3 ---
+        const s3 = new THREE.Shape();
+        s3.moveTo(-0.18, 0.42);
+        s3.lineTo(0.18, 0.42);
+        s3.quadraticCurveTo(0.28, 0.42, 0.28, 0.22);
+        s3.quadraticCurveTo(0.28, 0.04, 0.08, 0.02);
+        s3.quadraticCurveTo(0.30, 0.0, 0.30, -0.22);
+        s3.quadraticCurveTo(0.30, -0.42, 0.15, -0.42);
+        s3.lineTo(-0.18, -0.42);
+        s3.lineTo(-0.18, -0.26);
+        s3.lineTo(0.12, -0.26);
+        s3.quadraticCurveTo(0.18, -0.26, 0.18, -0.18);
+        s3.quadraticCurveTo(0.18, -0.08, 0.04, -0.08);
+        s3.lineTo(-0.08, -0.08);
+        s3.lineTo(-0.08, 0.06);
+        s3.lineTo(0.04, 0.06);
+        s3.quadraticCurveTo(0.16, 0.06, 0.16, 0.16);
+        s3.quadraticCurveTo(0.16, 0.26, 0.10, 0.26);
+        s3.lineTo(-0.18, 0.26);
+        s3.closePath();
+
+        const geo3 = new THREE.ExtrudeGeometry(s3, extrudeSettings);
+        const mesh3 = new THREE.Mesh(geo3, candleMat);
+        mesh3.castShadow = true;
+        // Position number 3 on left
+        const posX3 = -0.32;
+        const posY = 3.82;
+        mesh3.position.set(posX3 - 0.05, posY, 0);
+        this.cakeGroup.add(mesh3);
+
+        // Pick / stick at bottom of digit 3
+        const pickMat = new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.3 });
+        const pick3 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3, 12), pickMat);
+        pick3.position.set(posX3, posY - 0.48, 0.05);
+        this.cakeGroup.add(pick3);
+
+        // Wick 3
+        const wickMat = new THREE.MeshBasicMaterial({ color: 0x222222 });
+        const wick3 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.12, 8), wickMat);
+        wick3.position.set(posX3 + 0.02, posY + 0.5, 0.05);
+        this.cakeGroup.add(wick3);
+
+        // Flame 3
+        const flame3 = this.createFlameMesh();
+        flame3.position.set(posX3 + 0.02, posY + 0.64, 0.05);
+        this.cakeGroup.add(flame3);
+        this.candleFlames.push(flame3);
+
+        // Candle Light 3
+        const light3 = new THREE.PointLight(0xffa726, 2.0, 8, 2);
+        light3.position.set(posX3 + 0.02, posY + 0.65, 0.15);
+        light3.castShadow = true;
+        this.scene.add(light3);
+        this.candleLights.push(light3);
+
+        // --- DIGIT 1 ---
+        const s1 = new THREE.Shape();
+        s1.moveTo(-0.16, -0.42);
+        s1.lineTo(0.16, -0.42);
+        s1.lineTo(0.16, -0.26);
+        s1.lineTo(0.06, -0.26);
+        s1.lineTo(0.06, 0.42);
+        s1.lineTo(-0.06, 0.42);
+        s1.lineTo(-0.20, 0.24);
+        s1.lineTo(-0.12, 0.16);
+        s1.lineTo(-0.06, 0.22);
+        s1.lineTo(-0.06, -0.26);
+        s1.lineTo(-0.16, -0.26);
+        s1.closePath();
+
+        const geo1 = new THREE.ExtrudeGeometry(s1, extrudeSettings);
+        const mesh1 = new THREE.Mesh(geo1, candleMat);
+        mesh1.castShadow = true;
+        // Position number 1 on right
+        const posX1 = 0.32;
+        mesh1.position.set(posX1 - 0.02, posY, 0);
+        this.cakeGroup.add(mesh1);
+
+        // Pick / stick at bottom of digit 1
+        const pick1 = new THREE.Mesh(new THREE.CylinderGeometry(0.02, 0.02, 0.3, 12), pickMat);
+        pick1.position.set(posX1, posY - 0.48, 0.05);
+        this.cakeGroup.add(pick1);
+
+        // Wick 1
+        const wick1 = new THREE.Mesh(new THREE.CylinderGeometry(0.012, 0.012, 0.12, 8), wickMat);
+        wick1.position.set(posX1, posY + 0.5, 0.05);
+        this.cakeGroup.add(wick1);
+
+        // Flame 1
+        const flame1 = this.createFlameMesh();
+        flame1.position.set(posX1, posY + 0.64, 0.05);
+        this.cakeGroup.add(flame1);
+        this.candleFlames.push(flame1);
+
+        // Candle Light 1
+        const light1 = new THREE.PointLight(0xffa726, 2.0, 8, 2);
+        light1.position.set(posX1, posY + 0.65, 0.15);
+        light1.castShadow = true;
+        this.scene.add(light1);
+        this.candleLights.push(light1);
+    }
+
+    createFlameMesh() {
+        const flameGroup = new THREE.Group();
+
+        // Outer Flame (Glowing Orange)
+        const outerFlameGeo = new THREE.ConeGeometry(0.075, 0.24, 16);
+        outerFlameGeo.translate(0, 0.12, 0);
+        const outerFlameMat = new THREE.MeshBasicMaterial({
+            color: 0xff7700,
+            transparent: true,
+            opacity: 0.9
+        });
+        const outerFlame = new THREE.Mesh(outerFlameGeo, outerFlameMat);
+        flameGroup.add(outerFlame);
+
+        // Inner Flame Core (Bright Yellow-White)
+        const innerFlameGeo = new THREE.ConeGeometry(0.04, 0.16, 16);
+        innerFlameGeo.translate(0, 0.08, 0);
+        const innerFlameMat = new THREE.MeshBasicMaterial({
+            color: 0xffffff,
+            transparent: true,
+            opacity: 0.95
+        });
+        const innerFlame = new THREE.Mesh(innerFlameGeo, innerFlameMat);
+        flameGroup.add(innerFlame);
+
+        // Flame Halo Aura (Soft Sphere)
+        const haloGeo = new THREE.SphereGeometry(0.16, 16, 16);
+        const haloMat = new THREE.MeshBasicMaterial({
+            color: 0xffa500,
+            transparent: true,
+            opacity: 0.28
+        });
+        const halo = new THREE.Mesh(haloGeo, haloMat);
+        halo.position.y = 0.1;
+        flameGroup.add(halo);
+
+        return flameGroup;
+    }
+
+    /**
+     * Hanging Fairy Lights Garlands in the Background
+     */
+    createFairyLightsBackground() {
+        const garlandConfigs = [
+            {
+                start: new THREE.Vector3(-9, 8.5, -5.5),
+                mid: new THREE.Vector3(0, 6.8, -4.5),
+                end: new THREE.Vector3(9, 8.5, -5.5),
+                bulbCount: 16
+            },
+            {
+                start: new THREE.Vector3(-9, 7.2, -7.5),
+                mid: new THREE.Vector3(0, 5.0, -6.5),
+                end: new THREE.Vector3(9, 7.2, -7.5),
+                bulbCount: 18
+            }
+        ];
+
+        garlandConfigs.forEach((cfg) => {
+            const curve = new THREE.QuadraticBezierCurve3(cfg.start, cfg.mid, cfg.end);
+            
+            // Wire
+            const wireGeo = new THREE.TubeGeometry(curve, 40, 0.015, 6, false);
+            const wireMat = new THREE.MeshBasicMaterial({ color: 0x332244 });
+            const wire = new THREE.Mesh(wireGeo, wireMat);
+            this.scene.add(wire);
+
+            // Glowing Light Bulbs along the curve
+            const bulbMat = new THREE.MeshStandardMaterial({
+                color: 0xffe6a3,
+                emissive: 0xffaa00,
+                emissiveIntensity: 1.35,
+                roughness: 0.15
+            });
+
+            for (let i = 1; i < cfg.bulbCount; i++) {
+                const t = i / cfg.bulbCount;
+                const pt = curve.getPoint(t);
+
+                // Little hanging cord
+                const cordGeo = new THREE.CylinderGeometry(0.006, 0.006, 0.18, 6);
+                const cord = new THREE.Mesh(cordGeo, wireMat);
+                cord.position.set(pt.x, pt.y - 0.09, pt.z);
+                this.scene.add(cord);
+
+                // Bulb
+                const bulbGeo = new THREE.SphereGeometry(0.08, 16, 16);
+                const bulb = new THREE.Mesh(bulbGeo, bulbMat);
+                bulb.position.set(pt.x, pt.y - 0.22, pt.z);
+                this.scene.add(bulb);
+
+                this.fairyLights.push({
+                    mesh: bulb,
+                    baseIntensity: 1.35,
+                    phase: i * 0.4
+                });
+            }
+        });
+    }
+
+    /**
+     * Festive Birthday Bunting Flags in Background
+     */
+    createBuntingFlagsBackground() {
+        const flagColors = [0xff758c, 0xffd166, 0x06d6a0, 0x118ab2, 0xc77dff, 0xffbe0b];
+        const curve = new THREE.QuadraticBezierCurve3(
+            new THREE.Vector3(-8.5, 9.6, -6.0),
+            new THREE.Vector3(0, 8.4, -5.0),
+            new THREE.Vector3(8.5, 9.6, -6.0)
+        );
+
+        const flagCount = 20;
+        for (let i = 1; i < flagCount; i++) {
+            const t = i / flagCount;
+            const pt = curve.getPoint(t);
+            const color = flagColors[i % flagColors.length];
+
+            // Triangle shape
+            const flagShape = new THREE.Shape();
+            flagShape.moveTo(-0.16, 0);
+            flagShape.lineTo(0.16, 0);
+            flagShape.lineTo(0, -0.32);
+            flagShape.closePath();
+
+            const flagGeo = new THREE.ShapeGeometry(flagShape);
+            const flagMat = new THREE.MeshStandardMaterial({
+                color: color,
+                side: THREE.DoubleSide,
+                roughness: 0.4
+            });
+            const flag = new THREE.Mesh(flagGeo, flagMat);
+            flag.position.set(pt.x, pt.y, pt.z);
+
+            this.scene.add(flag);
+            this.buntingFlags.push({
+                mesh: flag,
+                phase: i * 0.35,
+                rotSpeed: 1.5
+            });
+        }
     }
 
     createBalloons() {
@@ -366,7 +596,6 @@ class BirthdayScene {
             });
 
             if (cfg.isHeart) {
-                // Heart-shaped Balloon
                 const shape = new THREE.Shape();
                 const x = 0, y = 0;
                 shape.moveTo(x + 0.25, y + 0.25);
@@ -384,12 +613,10 @@ class BirthdayScene {
                 balloonMesh.rotation.x = Math.PI;
                 balloonMesh.scale.set(1.4, 1.4, 1.4);
             } else {
-                // Oval Sphere Balloon
                 const sphereGeo = new THREE.SphereGeometry(0.65, 32, 32);
                 sphereGeo.scale(1, 1.25, 1);
                 balloonMesh = new THREE.Mesh(sphereGeo, mat);
 
-                // Little tie knot at bottom
                 const knot = new THREE.Mesh(new THREE.ConeGeometry(0.08, 0.1, 12), mat);
                 knot.position.y = -0.82;
                 group.add(knot);
@@ -427,7 +654,6 @@ class BirthdayScene {
         giftConfigs.forEach((cfg) => {
             const group = new THREE.Group();
 
-            // Box
             const boxGeo = new THREE.BoxGeometry(cfg.size, cfg.size, cfg.size);
             const boxMat = new THREE.MeshStandardMaterial({
                 color: cfg.boxColor,
@@ -438,7 +664,6 @@ class BirthdayScene {
             box.castShadow = true;
             group.add(box);
 
-            // Cross Ribbon
             const ribbonMat = new THREE.MeshStandardMaterial({
                 color: cfg.ribbonColor,
                 roughness: 0.1,
@@ -449,7 +674,6 @@ class BirthdayScene {
             group.add(rib1);
             group.add(rib2);
 
-            // Ribbon Bow on top
             const bowTorus1 = new THREE.Mesh(new THREE.TorusGeometry(0.14, 0.05, 12, 24), ribbonMat);
             bowTorus1.position.set(-0.1, cfg.size / 2 + 0.1, 0);
             bowTorus1.rotation.y = Math.PI / 4;
@@ -473,7 +697,7 @@ class BirthdayScene {
     }
 
     createStarfield() {
-        const starCount = 1200;
+        const starCount = 1400;
         const starGeo = new THREE.BufferGeometry();
         const positions = new Float32Array(starCount * 3);
         const colors = new Float32Array(starCount * 3);
@@ -486,7 +710,6 @@ class BirthdayScene {
         ];
 
         for (let i = 0; i < starCount; i++) {
-            // Distribute on sphere
             const u = Math.random();
             const v = Math.random();
             const theta = u * 2.0 * Math.PI;
@@ -518,7 +741,6 @@ class BirthdayScene {
     }
 
     createDistantLanterns() {
-        // Spawn gentle background lanterns that drift upward
         for (let i = 0; i < 18; i++) {
             const x = (Math.random() - 0.5) * 24;
             const y = Math.random() * 15 - 2;
@@ -530,7 +752,6 @@ class BirthdayScene {
     spawnSkyLantern(x = 0, y = 2, z = 0, scale = 0.65, isInteractive = true) {
         const group = new THREE.Group();
 
-        // Lantern Paper Cylinder with gentle taper
         const lanternGeo = new THREE.CylinderGeometry(0.35, 0.25, 0.9, 16);
         const lanternMat = new THREE.MeshStandardMaterial({
             color: 0xffaa33,
@@ -543,7 +764,6 @@ class BirthdayScene {
         const lanternMesh = new THREE.Mesh(lanternGeo, lanternMat);
         group.add(lanternMesh);
 
-        // Warm internal light
         const light = new THREE.PointLight(0xff9900, 1.2, 5);
         light.position.y = 0;
         group.add(light);
@@ -567,33 +787,36 @@ class BirthdayScene {
         if (!this.isCandleLit) return false;
         this.isCandleLit = false;
 
-        // Animate Flame Extinguishing
-        if (typeof gsap !== 'undefined' && this.candleFlame) {
-            gsap.to(this.candleFlame.scale, {
-                x: 0,
-                y: 0,
-                z: 0,
-                duration: 0.4,
-                ease: 'power2.in',
-                onComplete: () => {
-                    this.candleFlame.visible = false;
-                }
-            });
-
-            // Dim candle light
-            if (this.candleLight) {
-                gsap.to(this.candleLight, {
-                    intensity: 0.1,
-                    duration: 0.6
+        // Extinguish both flames
+        this.candleFlames.forEach(flame => {
+            if (typeof gsap !== 'undefined') {
+                gsap.to(flame.scale, {
+                    x: 0,
+                    y: 0,
+                    z: 0,
+                    duration: 0.4,
+                    ease: 'power2.in',
+                    onComplete: () => {
+                        flame.visible = false;
+                    }
                 });
+            } else {
+                flame.visible = false;
             }
-        } else if (this.candleFlame) {
-            this.candleFlame.visible = false;
-            if (this.candleLight) this.candleLight.intensity = 0.1;
-        }
+        });
 
-        // Spawn Smoke Particles
-        this.spawnSmokePuff();
+        // Dim candle lights
+        this.candleLights.forEach(light => {
+            if (typeof gsap !== 'undefined') {
+                gsap.to(light, { intensity: 0.05, duration: 0.5 });
+            } else {
+                light.intensity = 0.05;
+            }
+        });
+
+        // Spawn Smoke Particles from both candles
+        this.spawnSmokePuff(-0.30, 4.45);
+        this.spawnSmokePuff(0.32, 4.45);
 
         // Trigger Huge 3D Confetti Explosion
         this.explodeConfetti();
@@ -603,32 +826,38 @@ class BirthdayScene {
 
     relightCandle() {
         this.isCandleLit = true;
-        if (this.candleFlame) {
-            this.candleFlame.visible = true;
+        this.candleFlames.forEach(flame => {
+            flame.visible = true;
             if (typeof gsap !== 'undefined') {
-                gsap.to(this.candleFlame.scale, { x: 1, y: 1, z: 1, duration: 0.5, ease: 'back.out(2)' });
-                if (this.candleLight) gsap.to(this.candleLight, { intensity: 2.5, duration: 0.5 });
+                gsap.to(flame.scale, { x: 1, y: 1, z: 1, duration: 0.5, ease: 'back.out(2)' });
             } else {
-                this.candleFlame.scale.set(1, 1, 1);
-                if (this.candleLight) this.candleLight.intensity = 2.5;
+                flame.scale.set(1, 1, 1);
             }
-        }
+        });
+
+        this.candleLights.forEach(light => {
+            if (typeof gsap !== 'undefined') {
+                gsap.to(light, { intensity: 2.0, duration: 0.5 });
+            } else {
+                light.intensity = 2.0;
+            }
+        });
     }
 
-    spawnSmokePuff() {
-        const count = 18;
+    spawnSmokePuff(originX = 0, originY = 4.4) {
+        const count = 16;
         const smokeMat = new THREE.MeshBasicMaterial({
             color: 0xcccccc,
             transparent: true,
-            opacity: 0.6
+            opacity: 0.65
         });
 
         for (let i = 0; i < count; i++) {
             const geo = new THREE.SphereGeometry(0.04 + Math.random() * 0.04, 8, 8);
             const smoke = new THREE.Mesh(geo, smokeMat.clone());
             smoke.position.set(
-                (Math.random() - 0.5) * 0.08,
-                4.35,
+                originX + (Math.random() - 0.5) * 0.08,
+                originY,
                 (Math.random() - 0.5) * 0.08
             );
             this.scene.add(smoke);
@@ -644,7 +873,7 @@ class BirthdayScene {
     }
 
     explodeConfetti() {
-        const count = 280;
+        const count = 300;
         const colors = [0xffd700, 0xff1493, 0x00ffff, 0xff4500, 0x7b2cbf, 0xffffff, 0x38b000];
 
         for (let i = 0; i < count; i++) {
@@ -659,9 +888,9 @@ class BirthdayScene {
 
             // Start at cake top
             piece.position.set(
-                (Math.random() - 0.5) * 0.6,
+                (Math.random() - 0.5) * 0.8,
                 3.8 + Math.random() * 0.4,
-                (Math.random() - 0.5) * 0.6
+                (Math.random() - 0.5) * 0.8
             );
 
             // Explosive initial velocity
@@ -720,7 +949,7 @@ class BirthdayScene {
         // Auto-rotate scene subtly when enabled
         if (this.autoRotate && this.controls) {
             this.controls.autoRotate = true;
-            this.controls.autoRotateSpeed = 1.0;
+            this.controls.autoRotateSpeed = 0.9;
         } else if (this.controls) {
             this.controls.autoRotate = false;
         }
@@ -729,18 +958,34 @@ class BirthdayScene {
             this.controls.update();
         }
 
-        // Animate Candle Flame Flicker
-        if (this.isCandleLit && this.candleFlame) {
-            const flicker = Math.sin(elapsedTime * 18) * 0.08 + Math.cos(elapsedTime * 25) * 0.05;
-            this.candleFlame.scale.y = 1.0 + flicker;
-            this.candleFlame.scale.x = 1.0 - flicker * 0.5;
-            this.candleFlame.scale.z = 1.0 - flicker * 0.5;
-            this.candleFlame.rotation.z = Math.sin(elapsedTime * 12) * 0.06;
+        // Animate Dual Candle Flames Flicker
+        if (this.isCandleLit && this.candleFlames.length > 0) {
+            this.candleFlames.forEach((flame, idx) => {
+                const phase = idx * 1.5;
+                const flicker = Math.sin(elapsedTime * 18 + phase) * 0.08 + Math.cos(elapsedTime * 24 + phase) * 0.05;
+                flame.scale.y = 1.0 + flicker;
+                flame.scale.x = 1.0 - flicker * 0.5;
+                flame.scale.z = 1.0 - flicker * 0.5;
+                flame.rotation.z = Math.sin(elapsedTime * 12 + phase) * 0.06;
+            });
 
-            if (this.candleLight) {
-                this.candleLight.intensity = 2.4 + flicker * 1.5;
-            }
+            this.candleLights.forEach((light, idx) => {
+                const phase = idx * 1.5;
+                const flicker = Math.sin(elapsedTime * 18 + phase) * 0.08;
+                light.intensity = 1.9 + flicker * 1.2;
+            });
         }
+
+        // Animate Fairy Lights Shimmer
+        this.fairyLights.forEach((bulb) => {
+            const glow = Math.sin(elapsedTime * 2.5 + bulb.phase) * 0.35;
+            bulb.mesh.material.emissiveIntensity = bulb.baseIntensity + glow;
+        });
+
+        // Animate Bunting Flags Sway
+        this.buntingFlags.forEach((flag) => {
+            flag.mesh.rotation.x = Math.sin(elapsedTime * flag.rotSpeed + flag.phase) * 0.18;
+        });
 
         // Animate Floating Balloons
         this.balloons.forEach((b) => {
@@ -761,7 +1006,6 @@ class BirthdayScene {
             lan.mesh.position.x += Math.sin(elapsedTime * lan.swaySpeed + lan.swayOffset) * 0.008;
             lan.mesh.rotation.y += 0.25 * delta;
 
-            // Loop or remove if drifted too high
             if (lan.mesh.position.y > 22) {
                 if (lan.isInteractive) {
                     this.scene.remove(lan.mesh);
@@ -791,8 +1035,8 @@ class BirthdayScene {
         // Animate 3D Confetti Particles
         for (let i = this.confettiPieces.length - 1; i >= 0; i--) {
             const c = this.confettiPieces[i];
-            c.vy -= 0.007; // Gravity
-            c.vx *= 0.985; // Drag
+            c.vy -= 0.007;
+            c.vx *= 0.985;
             c.vz *= 0.985;
 
             c.mesh.position.x += c.vx;

@@ -11,8 +11,8 @@ document.addEventListener('DOMContentLoaded', () => {
     const defaultData = {
         sisterName: 'Chị Gái Yêu Quý',
         senderName: 'Em Của Chị',
-        customWish: 'Chúc chị tuổi mới luôn xinh đẹp rạng rỡ, sự nghiệp thăng hoa, tiền tài rủng rỉnh và luôn ngập tràn hạnh phúc!',
-        customLetter: `Hôm nay là một ngày thật đặc biệt — ngày mà một người chị tuyệt vời, xinh đẹp và ấm áp nhất trên đời ra đời! ✨\n\nCảm ơn chị vì đã luôn bao dung, che chở và chia sẻ mọi vui buồn cùng em. Dù đôi khi hai chị em có chí chóe, nhưng trong lòng em, chị luôn là thần tượng và là điểm tựa vững chãi nhất.\n\nBước sang tuổi mới, em chúc chị:\n🌸 Nhan sắc ngày càng thăng hạng, luôn trẻ trung và rạng ngời như tuổi đôi mươi.\n💼 Công việc thuận buồm xuôi gió, gặt hái được mọi ước mơ và dự định.\n💰 Tiền bạc rủng rỉnh, tiêu xài không cần nhìn giá!\n💖 Luôn được yêu thương, chiều chuộng và hạnh phúc trọn vẹn mỗi ngày!\n\nEm luôn tự hào và biết ơn vì được làm em của chị! Chúc mừng sinh nhật chị yêu! 🎉🎂`
+        customWish: 'Chúc chị tuổi 31 luôn xinh đẹp rạng rỡ, sự nghiệp thăng hoa, tiền tài rủng rỉnh và luôn ngập tràn hạnh phúc!',
+        customLetter: `Hôm nay là một ngày thật đặc biệt — sinh nhật tuổi 31 của người chị tuyệt vời, xinh đẹp và ấm áp nhất trên đời! ✨\n\nTuổi 31 — độ tuổi đẹp nhất của sự chín muồi, quyến rũ, bản lĩnh và độc lập. Cảm ơn chị vì đã luôn bao dung, che chở và chia sẻ mọi vui buồn cùng em. Dù đôi khi hai chị em có chí chóe, nhưng trong lòng em, chị luôn là thần tượng và là điểm tựa vững chãi nhất.\n\nBước sang tuổi 31, em chúc chị:\n🌸 Nhan sắc ngày càng thăng hạng, luôn trẻ trung và rạng ngời như tuổi đôi mươi.\n💼 Sự nghiệp thăng hoa rực rỡ, gặt hái được mọi ước mơ và dự định.\n💰 Tiền bạc rủng rỉnh, tài lộc hanh thông, tiêu xài không cần nhìn giá!\n💖 Luôn an yên, được yêu thương, chiều chuộng và hạnh phúc trọn vẹn mỗi ngày!\n\nEm luôn tự hào và biết ơn vì được làm em của chị! Chúc mừng sinh nhật tuổi 31 của chị yêu! 🎉🎂`
     };
 
     let userConfig = { ...defaultData };
@@ -85,7 +85,7 @@ document.addEventListener('DOMContentLoaded', () => {
             hasBlownCandle = false;
             blowBtn.innerHTML = `
                 <span class="btn-icon">🎂</span>
-                <span class="btn-text">Ước một điều ước & Thổi nến</span>
+                <span class="btn-text">Ước một điều ước & Thổi nến 31</span>
             `;
             return;
         }
@@ -104,7 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
         // Update button text
         blowBtn.innerHTML = `
             <span class="btn-icon">✨</span>
-            <span class="btn-text">Thắp lại nến bánh kem</span>
+            <span class="btn-text">Thắp lại nến 31</span>
         `;
 
         // Reveal Celebration Banner
@@ -390,6 +390,35 @@ document.addEventListener('DOMContentLoaded', () => {
                 }
             }
             if (window.birthdayAudio) window.birthdayAudio.playPop();
+        });
+    }
+
+    // 13. Background Theme Switcher
+    const themeBtn = document.getElementById('btn-toggle-theme');
+    const themes = [
+        { id: 'theme-starry', fog: 0x130722, name: 'Dạ Tiệc Sao' },
+        { id: 'theme-rose', fog: 0x240718, name: 'Hoa Hồng Lãng Mạn' },
+        { id: 'theme-gold', fog: 0x1f1605, name: 'Vàng Kim Quý Phái' },
+        { id: 'theme-aurora', fog: 0x05161f, name: 'Cực Quang Huyền Ảo' }
+    ];
+    let currentThemeIdx = 0;
+
+    if (themeBtn) {
+        themeBtn.addEventListener('click', () => {
+            currentThemeIdx = (currentThemeIdx + 1) % themes.length;
+            const newTheme = themes[currentThemeIdx];
+
+            // Update body class
+            themes.forEach(t => document.body.classList.remove(t.id));
+            document.body.classList.add(newTheme.id);
+
+            // Update 3D fog color
+            if (scene && scene.scene && scene.scene.fog) {
+                scene.scene.fog.color.setHex(newTheme.fog);
+            }
+
+            if (window.birthdayAudio) window.birthdayAudio.playPop();
+            fireConfetti(15);
         });
     }
 });

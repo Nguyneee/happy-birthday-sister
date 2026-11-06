@@ -3,19 +3,26 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Chúc Mừng Sinh Nhật Chị Yêu ✨ | Happy Birthday 3D</title>
-    <meta name="description" content="Thiệp chúc mừng sinh nhật 3D lung linh dành tặng người chị gái tuyệt vời nhất!">
+    <title>Chúc Mừng Sinh Nhật Chị Yêu Tuổi 31 ✨ | Happy 31st Birthday 3D</title>
+    <meta name="description" content="Thiệp chúc mừng sinh nhật 3D lung linh mừng tuổi 31 người chị gái tuyệt vời nhất!">
     
     <!-- OpenGraph / Social Sharing -->
-    <meta property="og:title" content="Chúc Mừng Sinh Nhật Chị Gái Yêu Quý 🎉🎂">
-    <meta property="og:description" content="Chạm để mở món quà sinh nhật 3D đặc biệt đầy bất ngờ!">
+    <meta property="og:title" content="Chúc Mừng Sinh Nhật Tuổi 31 Chị Gái Yêu Quý 🎉🎂">
+    <meta property="og:description" content="Chạm để mở món quà sinh nhật 3D đặc biệt đầy bất ngờ mừng tuổi 31!">
     <meta property="og:type" content="website">
 
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/style.css">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🎂</text></svg>">
 </head>
-<body>
+<body class="theme-starry">
+
+    <!-- Ambient Layered Glows (Background) -->
+    <div class="ambient-bg">
+        <div class="ambient-glow glow-1"></div>
+        <div class="ambient-glow glow-2"></div>
+        <div class="ambient-glow glow-3"></div>
+    </div>
 
     <!-- 1. WebGL 3D Canvas Container -->
     <div id="canvas-container"></div>
@@ -24,13 +31,13 @@
     <div id="intro-overlay" class="intro-overlay">
         <div class="intro-card">
             <div class="intro-gift-icon">🎁</div>
-            <p class="intro-subtitle">Gửi người chị tuyệt vời nhất</p>
+            <p class="intro-subtitle">Mừng sinh nhật tuổi 31 người chị tuyệt vời nhất</p>
             <h1 class="intro-title"><span class="sister-name-display">Chị Gái Yêu Quý</span></h1>
             <p class="intro-desc">
-                Em có một món quà sinh nhật 3D đặc biệt muốn dành tặng riêng cho chị. Hãy bật loa lên để tận hưởng trọn vẹn nhé! ✨
+                Chào mừng tuổi 31 rực rỡ! Em có một món quà sinh nhật 3D đặc biệt muốn dành tặng riêng cho chị. Hãy bật loa lên để tận hưởng trọn vẹn nhé! ✨
             </p>
             <button id="btn-open-gift" class="btn-open-gift">
-                <span>Mở món quà sinh nhật</span>
+                <span>Mở món quà sinh nhật tuổi 31</span>
                 <span>✨</span>
             </button>
         </div>
@@ -42,9 +49,13 @@
         <header class="top-bar">
             <div class="logo-tag">
                 <span>🎂</span>
-                <span>HAPPY BIRTHDAY</span>
+                <span>HAPPY 31ST BIRTHDAY</span>
             </div>
             <div class="top-actions">
+                <!-- Theme Switcher Button -->
+                <button id="btn-toggle-theme" class="icon-btn" title="Đổi chủ đề nền (Dạ tiệc / Hoa hồng / Ánh vàng / Cực quang)">
+                    <span>🎨</span>
+                </button>
                 <!-- Music Toggle Button -->
                 <button id="btn-toggle-music" class="icon-btn active" title="Bật/Tắt Nhạc Sinh Nhật">
                     <div id="audio-waves" class="audio-waves">
@@ -70,8 +81,8 @@
 
         <!-- Center Celebratory Banner (Hidden until blown) -->
         <div id="celebration-banner" class="celebration-banner hidden">
-            <span class="badge-tag">CHÚC MỪNG SINH NHẬT</span>
-            <h2 class="hero-hbd-text">Tuổi Mới Rực Rỡ & Hạnh Phúc! 🎉</h2>
+            <span class="badge-tag">CHÚC MỪNG SINH NHẬT TUỔI 31 👑</span>
+            <h2 class="hero-hbd-text">Chào Tuổi 31 Rực Rỡ & Viên Mãn! 🎉</h2>
         </div>
 
         <!-- Bottom Container -->
@@ -79,7 +90,7 @@
             <!-- Blow Candle Action Button -->
             <button id="btn-blow-candle" class="btn-blow-candle">
                 <span class="btn-icon">🎂</span>
-                <span class="btn-text">Ước một điều ước & Thổi nến</span>
+                <span class="btn-text">Ước một điều ước & Thổi nến 31</span>
             </button>
 
             <!-- Navigation Tabs (Revealed after blow) -->
@@ -116,14 +127,14 @@
                     Gửi <span class="sister-name-display">Chị Gái Yêu Quý</span> thân thương,
                 </div>
                 <div id="letter-content-text" class="letter-body">
-                    Hôm nay là một ngày thật đặc biệt — ngày mà một người chị tuyệt vời, xinh đẹp và ấm áp nhất trên đời ra đời! ✨<br><br>
-                    Cảm ơn chị vì đã luôn bao dung, che chở và chia sẻ mọi vui buồn cùng em. Dù đôi khi hai chị em có chí chóe, nhưng trong lòng em, chị luôn là thần tượng và là điểm tựa vững chãi nhất.<br><br>
-                    Bước sang tuổi mới, em chúc chị:<br>
+                    Hôm nay là một ngày thật đặc biệt — sinh nhật tuổi 31 của người chị tuyệt vời, xinh đẹp và ấm áp nhất trên đời! ✨<br><br>
+                    Tuổi 31 — độ tuổi đẹp nhất của sự chín muồi, quyến rũ, bản lĩnh và độc lập. Cảm ơn chị vì đã luôn bao dung, che chở và chia sẻ mọi vui buồn cùng em. Dù đôi khi hai chị em có chí chóe, nhưng trong lòng em, chị luôn là thần tượng và là điểm tựa vững chãi nhất.<br><br>
+                    Bước sang tuổi 31, em chúc chị:<br>
                     🌸 Nhan sắc ngày càng thăng hạng, luôn trẻ trung và rạng ngời như tuổi đôi mươi.<br>
-                    💼 Công việc thuận buồm xuôi gió, gặt hái được mọi ước mơ và dự định.<br>
-                    💰 Tiền bạc rủng rỉnh, tiêu xài không cần nhìn giá!<br>
-                    💖 Luôn được yêu thương, chiều chuộng và hạnh phúc trọn vẹn mỗi ngày!<br><br>
-                    Em luôn tự hào và biết ơn vì được làm em của chị! Chúc mừng sinh nhật chị yêu! 🎉🎂
+                    💼 Sự nghiệp thăng hoa rực rỡ, gặt hái được mọi ước mơ và dự định.<br>
+                    💰 Tiền bạc rủng rỉnh, tài lộc hanh thông, tiêu xài không cần nhìn giá!<br>
+                    💖 Luôn an yên, được yêu thương, chiều chuộng và hạnh phúc trọn vẹn mỗi ngày!<br><br>
+                    Em luôn tự hào và biết ơn vì được làm em của chị! Chúc mừng sinh nhật tuổi 31 của chị yêu! 🎉🎂
                 </div>
                 <div class="letter-sign">
                     <p class="letter-sign-text">Yêu thương vô bờ bến,</p>
